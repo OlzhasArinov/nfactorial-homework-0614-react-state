@@ -21,7 +21,7 @@ const buttons = [
 const toDoItems = [
   {
     key: uuidv4(),
-    label: "Have fun",
+    label: "Have funny day",
   },
   {
     key: uuidv4(),
@@ -102,6 +102,39 @@ function App() {
       ? items.filter((item) => !item.done)
       : items.filter((item) => item.done);
 
+
+      // Homework
+
+      const [searchedItem, setSearchedItem] = useState(() => items);
+
+      const [value, setValue] = useState('');
+
+      const filteredItemsInSearch = (event) => {
+        setValue(event.target.value);
+    
+        const suitableItems = searchedItem.filter((item) =>
+          item.label.toLowerCase().includes(event.target.value.toLowerCase())
+        );
+        setItems([...suitableItems]);
+      };
+
+      const handleItemImportant = ({key}) => {
+        const itemIndex = items.findIndex((item) => item.key === key);
+        const oldItem = items[itemIndex];
+        const newItem = { ...oldItem, important: !oldItem.important };
+        const leftSideOfAnArray = items.slice(0, itemIndex);
+        const rightSideOfAnArray = items.slice(itemIndex + 1, items.length);
+        setItems([...leftSideOfAnArray, newItem, ...rightSideOfAnArray]);
+      };
+
+      const handleItemDelete = ({key}) => {
+        const itemIndex = items.findIndex((item) => item.key === key);
+        const deletedItem = items[itemIndex];
+        const leftSideOfAnArray = items.slice(0, itemIndex);
+        const rightSideOfAnArray = items.slice(itemIndex + 1, items.length);
+        setItems([...leftSideOfAnArray, ...rightSideOfAnArray]);
+      }
+
   return (
     <div className="todo-app">
       {/* App-header */}
@@ -118,6 +151,8 @@ function App() {
           type="text"
           className="form-control search-input"
           placeholder="type to search"
+          value={value}
+          onChange={filteredItemsInSearch}
         />
         {/* Item-status-filter */}
         <div className="btn-group">
@@ -141,7 +176,7 @@ function App() {
         {filteredItems.length > 0 &&
           filteredItems.map((item) => (
             <li key={item.key} className="list-group-item">
-              <span className={`todo-list-item${item.done ? " done" : ""}`}>
+              <span className={`todo-list-item${item.done ? " done" : ""} ${item.important ? " important" : ""}`}>
                 <span
                   className="todo-list-item-label"
                   onClick={() => handleItemDone(item)}
@@ -152,6 +187,7 @@ function App() {
                 <button
                   type="button"
                   className="btn btn-outline-success btn-sm float-right"
+                  onClick={() => handleItemImportant(item)}
                 >
                   <i className="fa fa-exclamation" />
                 </button>
@@ -159,6 +195,7 @@ function App() {
                 <button
                   type="button"
                   className="btn btn-outline-danger btn-sm float-right"
+                  onClick={() => handleItemDelete(item)}
                 >
                   <i className="fa fa-trash-o" />
                 </button>
